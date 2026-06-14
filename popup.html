@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>知识卡片</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <header id="toolbar"></header>
+    <main id="cardList" class="card-list"></main>
+    <div id="emptyState" class="empty-state" style="display:none">
+      <p>暂无卡片，点击 <strong>+</strong> 创建</p>
+    </div>
+    <div id="editorView" class="editor-view" style="display:none"></div>
+  </div>
+
+  <script src="utils/classify.js"></script>
+  <script src="utils/version.js"></script>
+  <script src="utils/export.js"></script>
+  <script src="db/indexedDB.js"></script>
+  <script src="db/storage.js"></script>
+  <script src="components/tagBar.js"></script>
+  <script src="components/toolbar.js"></script>
+  <script src="components/recordCard.js"></script>
+  <script src="components/modal.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

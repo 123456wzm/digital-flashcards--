@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "速记卡片",
+  "version": "1.0.0",
+  "description": "快速记录、分类和管理你的笔记，支持标签、搜索、图片和导入导出",
+  "permissions": ["storage", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
