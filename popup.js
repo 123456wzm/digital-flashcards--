@@ -6,6 +6,9 @@ window.CardManager.App = (function () {
   let searchQuery = '';
   let batchMode = false;
   let activeTagFilter = null;
+  let dateFrom = null;
+  let dateTo = null;
+  let sortOrder = 'desc';
 
   async function init() {
     colorConfig = await CardManager.Storage.getColorConfig();
@@ -25,6 +28,7 @@ window.CardManager.App = (function () {
   async function refresh() {
     allRecords = await CardManager.Storage.getAll();
     renderTagFilter();
+    renderFilterBar();
     renderRecords();
   }
 
@@ -71,6 +75,75 @@ window.CardManager.App = (function () {
     }
   }
 
+  function renderFilterBar() {
+    const container = document.getElementById('filterBar');
+    const hasFilters = dateFrom || dateTo || sortOrder === 'asc';
+    container.innerHTML = '';
+    if (!hasFilters && allRecords.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+    container.style.display = '';
+
+    const row = document.createElement('div');
+    row.className = 'filter-bar-row';
+
+    const fromLabel = document.createElement('span');
+    fromLabel.className = 'filter-label';
+    fromLabel.textContent = '从';
+    const fromInput = document.createElement('input');
+    fromInput.type = 'date';
+    fromInput.className = 'filter-date';
+    fromInput.value = dateFrom || '';
+    fromInput.addEventListener('change', (e) => {
+      dateFrom = e.target.value || null;
+      renderRecords();
+    });
+
+    const toLabel = document.createElement('span');
+    toLabel.className = 'filter-label';
+    toLabel.textContent = '至';
+    const toInput = document.createElement('input');
+    toInput.type = 'date';
+    toInput.className = 'filter-date';
+    toInput.value = dateTo || '';
+    toInput.addEventListener('change', (e) => {
+      dateTo = e.target.value || null;
+      renderRecords();
+    });
+
+    const sortBtn = document.createElement('button');
+    sortBtn.className = 'filter-sort-btn' + (sortOrder === 'asc' ? ' active' : '');
+    sortBtn.textContent = sortOrder === 'desc' ? '最新优先 ↓' : '最早优先 ↑';
+    sortBtn.addEventListener('click', () => {
+      sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+      renderFilterBar();
+      renderRecords();
+    });
+
+    row.appendChild(fromLabel);
+    row.appendChild(fromInput);
+    row.appendChild(toLabel);
+    row.appendChild(toInput);
+    row.appendChild(sortBtn);
+
+    if (hasFilters) {
+      const clearBtn = document.createElement('button');
+      clearBtn.className = 'filter-clear';
+      clearBtn.textContent = '清除';
+      clearBtn.addEventListener('click', () => {
+        dateFrom = null;
+        dateTo = null;
+        sortOrder = 'desc';
+        renderFilterBar();
+        renderRecords();
+      });
+      row.appendChild(clearBtn);
+    }
+
+    container.appendChild(row);
+  }
+
   function renderRecords() {
     const container = document.getElementById('cardList');
     const emptyState = document.getElementById('emptyState');
@@ -96,6 +169,21 @@ window.CardManager.App = (function () {
         (r.customTags || []).includes(activeTagFilter)
       );
     }
+    if (dateFrom) {
+      const from = new Date(dateFrom).getTime();
+      filtered = filtered.filter(r => r.updatedAt >= from);
+    }
+    if (dateTo) {
+      const to = new Date(dateTo).getTime() + 86400000;
+      filtered = filtered.filter(r => r.updatedAt < to);
+    }
+
+    const pinned = filtered.filter(r => r.pinned);
+    const unpinned = filtered.filter(r => !r.pinned);
+    const sortFn = (a, b) => sortOrder === 'asc' ? a.updatedAt - b.updatedAt : b.updatedAt - a.updatedAt;
+    pinned.sort(sortFn);
+    unpinned.sort(sortFn);
+    filtered = [...pinned, ...unpinned];
 
     if (filtered.length === 0) {
       emptyState.style.display = 'block';
