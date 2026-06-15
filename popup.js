@@ -5,6 +5,7 @@ window.CardManager.App = (function () {
   let colorConfig = { text: '#4CAF50', image: '#2196F3', link: '#FF9800' };
   let searchQuery = '';
   let batchMode = false;
+  let activeTagFilter = null;
 
   async function init() {
     colorConfig = await CardManager.Storage.getColorConfig();
@@ -23,7 +24,51 @@ window.CardManager.App = (function () {
 
   async function refresh() {
     allRecords = await CardManager.Storage.getAll();
+    renderTagFilter();
     renderRecords();
+  }
+
+  function getAllTags() {
+    const tagSet = new Set();
+    allRecords.forEach(r => {
+      (r.systemTags || []).forEach(t => tagSet.add(t));
+      (r.customTags || []).forEach(t => tagSet.add(t));
+    });
+    return [...tagSet].sort();
+  }
+
+  function renderTagFilter() {
+    const container = document.getElementById('tagFilter');
+    const tags = getAllTags();
+    if (tags.length === 0) {
+      container.innerHTML = '';
+      container.style.display = 'none';
+      return;
+    }
+    container.style.display = '';
+    container.innerHTML = '';
+    tags.forEach(tag => {
+      const pill = document.createElement('span');
+      pill.className = 'tag-filter-pill' + (activeTagFilter === tag ? ' active' : '');
+      pill.textContent = tag;
+      pill.addEventListener('click', () => {
+        activeTagFilter = activeTagFilter === tag ? null : tag;
+        renderTagFilter();
+        renderRecords();
+      });
+      container.appendChild(pill);
+    });
+    if (activeTagFilter) {
+      const clear = document.createElement('span');
+      clear.className = 'tag-filter-clear';
+      clear.textContent = '清除';
+      clear.addEventListener('click', () => {
+        activeTagFilter = null;
+        renderTagFilter();
+        renderRecords();
+      });
+      container.appendChild(clear);
+    }
   }
 
   function renderRecords() {
@@ -34,7 +79,7 @@ window.CardManager.App = (function () {
     let filtered = allRecords;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      filtered = allRecords.filter(r => {
+      filtered = filtered.filter(r => {
         const titleMatch = (r.title || '').toLowerCase().includes(q);
         const textMatch = (r.content.text || '').toLowerCase().includes(q);
         const tagMatch = (r.customTags || []).some(t => t.toLowerCase().includes(q));
@@ -44,6 +89,12 @@ window.CardManager.App = (function () {
         );
         return titleMatch || textMatch || tagMatch || sysMatch || linkMatch;
       });
+    }
+    if (activeTagFilter) {
+      filtered = filtered.filter(r =>
+        (r.systemTags || []).includes(activeTagFilter) ||
+        (r.customTags || []).includes(activeTagFilter)
+      );
     }
 
     if (filtered.length === 0) {

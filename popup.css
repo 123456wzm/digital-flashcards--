@@ -124,6 +124,59 @@ body {
   margin-right: auto;
 }
 
+/* ===== Tag Filter ===== */
+.tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+}
+
+.tag-filter:empty {
+  display: none;
+}
+
+.tag-filter-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  background: #f0f0f0;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.tag-filter-pill:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.tag-filter-pill.active {
+  background: #4285f4;
+  color: white;
+  font-weight: 600;
+}
+
+.tag-filter-clear {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  background: #fce8e6;
+  color: #d93025;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.tag-filter-clear:hover {
+  background: #f8d7da;
+}
+
 /* ===== Card List ===== */
 .card-list {
   display: flex;
