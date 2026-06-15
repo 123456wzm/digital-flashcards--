@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "快速记录、分类和管理你的笔记，支持标签、搜索、图片和导入导出",
   "permissions": ["storage", "activeTab"],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },

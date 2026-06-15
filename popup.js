@@ -15,7 +15,8 @@ window.CardManager.App = (function () {
       onBatchTag: handleBatchTag,
       onImport: handleImport,
       onExport: handleExport,
-      onAdd: handleAdd
+      onAdd: handleAdd,
+      onSettings: handleSettings
     });
     await refresh();
   }
@@ -135,6 +136,10 @@ window.CardManager.App = (function () {
   function handleCheck(id) {
     CardManager.Toolbar.toggleSelect(id);
     renderRecords();
+  }
+
+  function handleSettings() {
+    CardManager.Settings.open(refresh);
   }
 
   return { init, refresh };

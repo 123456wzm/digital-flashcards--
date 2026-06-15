@@ -22,6 +22,7 @@ window.CardManager.Toolbar = (function () {
         <button id="batchToggleBtn" class="toolbar-btn">选择</button>
         <button id="importBtn" class="toolbar-btn">导入</button>
         <button id="exportBtn" class="toolbar-btn">导出</button>
+        <button id="settingsBtn" class="toolbar-btn" title="WebDAV 同步设置">⚙</button>
       </div>
       <div id="batchBar" class="toolbar-row batch-bar" style="display:none">
         <span id="selectedCount">已选 0 项</span>
@@ -63,6 +64,10 @@ window.CardManager.Toolbar = (function () {
 
     document.getElementById('exportBtn').addEventListener('click', () => {
       callbacks.onExport && callbacks.onExport();
+    });
+
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+      callbacks.onSettings && callbacks.onSettings();
     });
 
     document.getElementById('batchDeleteBtn').addEventListener('click', () => {
