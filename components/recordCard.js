@@ -79,8 +79,7 @@ window.CardManager.RecordCard = (function () {
 
     const meta = document.createElement('div');
     meta.className = 'card-meta';
-    const date = new Date(record.updatedAt);
-    meta.textContent = date.toLocaleDateString();
+    meta.textContent = '最近更新：' + new Date(record.updatedAt).toLocaleDateString();
 
     body.appendChild(header);
     body.appendChild(preview);

@@ -17,6 +17,8 @@ window.CardManager.Modal = (function () {
     customTags = record ? [...(record.customTags || [])] : [];
 
     document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('tagFilter').style.display = 'none';
+    document.getElementById('filterBar').style.display = 'none';
     document.getElementById('cardList').style.display = 'none';
     document.getElementById('emptyState').style.display = 'none';
     const editorView = document.getElementById('editorView');
@@ -29,6 +31,8 @@ window.CardManager.Modal = (function () {
     editorView.style.display = 'none';
     editorView.innerHTML = '';
     document.getElementById('toolbar').style.display = '';
+    document.getElementById('tagFilter').style.display = '';
+    document.getElementById('filterBar').style.display = '';
     document.getElementById('cardList').style.display = '';
     currentRecord = null;
     imageFiles = [];
@@ -41,8 +45,11 @@ window.CardManager.Modal = (function () {
     const title = isEditing ? '编辑卡片' : '新建卡片';
     container.innerHTML = `
       <div class="editor-header">
-        <button id="editorBackBtn" class="toolbar-btn">← 返回</button>
-        <h2>${title}</h2>
+        <div class="editor-header-top">
+          <button id="editorBackBtn" class="toolbar-btn">← 返回</button>
+          <h2>${title}</h2>
+        </div>
+        ${isEditing && currentRecord ? '<span class="card-times">创建: ' + new Date(currentRecord.createdAt).toLocaleString('zh-CN') + ' | 更新: ' + new Date(currentRecord.updatedAt).toLocaleString('zh-CN') + '</span>' : ''}
       </div>
       <div class="editor-content">
         <label>标题</label>

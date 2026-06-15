@@ -182,6 +182,9 @@ body {
   padding: 6px 12px;
   border-bottom: 1px solid #e0e0e0;
   background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .filter-bar:empty {
@@ -429,8 +432,8 @@ body {
 
 .editor-header {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
   padding: 14px 16px;
   border-bottom: 1px solid #eee;
   background: white;
@@ -439,10 +442,17 @@ body {
   z-index: 10;
 }
 
+.editor-header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .editor-header h2 {
   font-size: 16px;
   font-weight: 600;
   color: #333;
+  margin: 0;
 }
 
 .editor-content {
@@ -506,6 +516,11 @@ body {
   padding: 12px 16px;
   border-top: 1px solid #eee;
   background: #fafafa;
+}
+
+.card-times {
+  font-size: 11px;
+  color: #999;
 }
 
 .system-tags-preview {

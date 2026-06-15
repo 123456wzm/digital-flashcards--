@@ -9,6 +9,7 @@ window.CardManager.App = (function () {
   let dateFrom = null;
   let dateTo = null;
   let sortOrder = 'desc';
+  let sortField = 'updatedAt';
 
   async function init() {
     colorConfig = await CardManager.Storage.getColorConfig();
@@ -78,7 +79,7 @@ window.CardManager.App = (function () {
 
   function renderFilterBar() {
     const container = document.getElementById('filterBar');
-    const hasFilters = dateFrom || dateTo || sortOrder === 'asc';
+    const hasFilters = dateFrom || dateTo || sortOrder === 'asc' || sortField !== 'updatedAt';
     container.innerHTML = '';
     if (!hasFilters && allRecords.length === 0) {
       container.style.display = 'none';
@@ -86,8 +87,8 @@ window.CardManager.App = (function () {
     }
     container.style.display = '';
 
-    const row = document.createElement('div');
-    row.className = 'filter-bar-row';
+    const row1 = document.createElement('div');
+    row1.className = 'filter-bar-row';
 
     const fromLabel = document.createElement('span');
     fromLabel.className = 'filter-label';
@@ -113,20 +114,39 @@ window.CardManager.App = (function () {
       renderRecords();
     });
 
-    const sortBtn = document.createElement('button');
-    sortBtn.className = 'filter-sort-btn' + (sortOrder === 'asc' ? ' active' : '');
-    sortBtn.textContent = sortOrder === 'desc' ? '最新优先 ↓' : '最早优先 ↑';
-    sortBtn.addEventListener('click', () => {
+    row1.appendChild(fromLabel);
+    row1.appendChild(fromInput);
+    row1.appendChild(toLabel);
+    row1.appendChild(toInput);
+
+    const row2 = document.createElement('div');
+    row2.className = 'filter-bar-row';
+
+    const sortFieldLabel = document.createElement('span');
+    sortFieldLabel.className = 'filter-label';
+    sortFieldLabel.textContent = '排序';
+
+    const sortFieldBtn = document.createElement('button');
+    sortFieldBtn.className = 'filter-sort-btn' + (sortField !== 'updatedAt' ? ' active' : '');
+    sortFieldBtn.textContent = sortField === 'createdAt' ? '按创建时间' : '按更新时间';
+    sortFieldBtn.addEventListener('click', () => {
+      sortField = sortField === 'updatedAt' ? 'createdAt' : 'updatedAt';
+      renderFilterBar();
+      renderRecords();
+    });
+
+    const sortOrderBtn = document.createElement('button');
+    sortOrderBtn.className = 'filter-sort-btn' + (sortOrder === 'asc' ? ' active' : '');
+    sortOrderBtn.textContent = sortOrder === 'desc' ? '↓ 最新' : '↑ 最早';
+    sortOrderBtn.addEventListener('click', () => {
       sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
       renderFilterBar();
       renderRecords();
     });
 
-    row.appendChild(fromLabel);
-    row.appendChild(fromInput);
-    row.appendChild(toLabel);
-    row.appendChild(toInput);
-    row.appendChild(sortBtn);
+    row2.appendChild(sortFieldLabel);
+    row2.appendChild(sortFieldBtn);
+    row2.appendChild(sortOrderBtn);
 
     if (hasFilters) {
       const clearBtn = document.createElement('button');
@@ -136,13 +156,15 @@ window.CardManager.App = (function () {
         dateFrom = null;
         dateTo = null;
         sortOrder = 'desc';
+        sortField = 'updatedAt';
         renderFilterBar();
         renderRecords();
       });
-      row.appendChild(clearBtn);
+      row2.appendChild(clearBtn);
     }
 
-    container.appendChild(row);
+    container.appendChild(row1);
+    container.appendChild(row2);
   }
 
   function renderRecords() {
@@ -179,12 +201,9 @@ window.CardManager.App = (function () {
       filtered = filtered.filter(r => r.updatedAt < to);
     }
 
-    const pinned = filtered.filter(r => r.pinned);
-    const unpinned = filtered.filter(r => !r.pinned);
-    const sortFn = (a, b) => sortOrder === 'asc' ? a.updatedAt - b.updatedAt : b.updatedAt - a.updatedAt;
-    pinned.sort(sortFn);
-    unpinned.sort(sortFn);
-    filtered = [...pinned, ...unpinned];
+    filtered.sort((a, b) => {
+      return sortOrder === 'asc' ? a[sortField] - b[sortField] : b[sortField] - a[sortField];
+    });
 
     if (filtered.length === 0) {
       emptyState.style.display = 'block';
