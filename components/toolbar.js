@@ -25,6 +25,7 @@ window.CardManager.Toolbar = (function () {
         <button id="settingsBtn" class="toolbar-btn" title="WebDAV 同步设置">⚙</button>
       </div>
       <div id="batchBar" class="toolbar-row batch-bar" style="display:none">
+        <button id="batchSelectAllBtn" class="toolbar-btn">全选</button>
         <span id="selectedCount">已选 0 项</span>
         <button id="batchDeleteBtn" class="toolbar-btn btn-danger">删除</button>
         <button id="batchTagBtn" class="toolbar-btn">添加标签</button>
@@ -90,6 +91,10 @@ window.CardManager.Toolbar = (function () {
       selectedIds = [];
       setBatchMode(false);
     });
+
+    document.getElementById('batchSelectAllBtn').addEventListener('click', () => {
+      callbacks.onBatchSelectAll && callbacks.onBatchSelectAll();
+    });
   }
 
   function setBatchMode(enabled) {
@@ -131,5 +136,19 @@ window.CardManager.Toolbar = (function () {
     if (input) input.value = '';
   }
 
-  return { init, isBatchMode, isSelected, toggleSelect, getSelectedIds, clearSearch };
+  function selectAll(ids) {
+    selectedIds = [...ids];
+    updateSelectedCount();
+  }
+
+  function deselectAll() {
+    selectedIds = [];
+    updateSelectedCount();
+  }
+
+  function isAllSelected(count) {
+    return selectedIds.length === count && count > 0;
+  }
+
+  return { init, isBatchMode, isSelected, toggleSelect, getSelectedIds, clearSearch, selectAll, deselectAll, isAllSelected };
 })();

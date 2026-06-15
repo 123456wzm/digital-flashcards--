@@ -17,6 +17,7 @@ window.CardManager.App = (function () {
       onBatchToggle: handleBatchToggle,
       onBatchDelete: handleBatchDelete,
       onBatchTag: handleBatchTag,
+      onBatchSelectAll: handleBatchSelectAll,
       onImport: handleImport,
       onExport: handleExport,
       onAdd: handleAdd,
@@ -225,6 +226,48 @@ window.CardManager.App = (function () {
   async function handleBatchTag(ids, tag) {
     await CardManager.Storage.batchAddTag(ids, tag);
     await refresh();
+  }
+
+  function getFilteredIds() {
+    let filtered = allRecords;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(r => {
+        const titleMatch = (r.title || '').toLowerCase().includes(q);
+        const textMatch = (r.content.text || '').toLowerCase().includes(q);
+        const tagMatch = (r.customTags || []).some(t => t.toLowerCase().includes(q));
+        const sysMatch = (r.systemTags || []).some(t => t.toLowerCase().includes(q));
+        const linkMatch = (r.content.links || []).some(l =>
+          (l.title || '').toLowerCase().includes(q) || (l.url || '').toLowerCase().includes(q)
+        );
+        return titleMatch || textMatch || tagMatch || sysMatch || linkMatch;
+      });
+    }
+    if (activeTagFilter) {
+      filtered = filtered.filter(r =>
+        (r.systemTags || []).includes(activeTagFilter) ||
+        (r.customTags || []).includes(activeTagFilter)
+      );
+    }
+    if (dateFrom) {
+      const from = new Date(dateFrom).getTime();
+      filtered = filtered.filter(r => r.updatedAt >= from);
+    }
+    if (dateTo) {
+      const to = new Date(dateTo).getTime() + 86400000;
+      filtered = filtered.filter(r => r.updatedAt < to);
+    }
+    return filtered.map(r => r.id);
+  }
+
+  function handleBatchSelectAll() {
+    const ids = getFilteredIds();
+    if (CardManager.Toolbar.isAllSelected(ids.length)) {
+      CardManager.Toolbar.deselectAll();
+    } else {
+      CardManager.Toolbar.selectAll(ids);
+    }
+    renderRecords();
   }
 
   async function handleImport(file) {
